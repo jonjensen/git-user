@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# git-user
+# by Jon Jensen <jon@endpointdev.com>
+# https://www.endpointdev.com/
+# Released to the public domain
+#
+# git-user is a convenience wrapper for git commands that sets the author
+# and committer from a predetermined list of usernames.
+#
+# It is most useful when you are working in another user's account, or as
+# root, and want to commit changes with you as the author and committer.
+#
+# For example:
+# git-user testy commit
+
+usage() {
+    echo "Usage: git-user username command [args ...]" >&2
+    exit 1
+}
+
+if [ -z "$*" ]; then
+    usage
+fi
+
+user="$1"
+shift
+
+if [ -z "$*" ]; then
+    usage
+fi
+
+case "$user" in
+	testy)
+		name='Testy Tester'
+		email='testy@tester.example'
+	;;
+	youruser)
+		name='Your Name'
+		email='you@email.example'
+	;;
+esac
+
+if [ -z "$name" -o -z "$email" ]; then
+	echo "Username $user not configured" >&2
+	exit 2
+fi
+
+GIT_AUTHOR_NAME="$name" GIT_AUTHOR_EMAIL="$email" GIT_COMMITTER_NAME="$name" GIT_COMMITTER_EMAIL="$email" \
+    git "$@"
